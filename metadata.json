@@ -1,0 +1,6 @@
+{
+  "name": "BreatheWise AI",
+  "description": "Hyperlocal air quality intelligence, 96-hour exposure forecasting, and Gemini-powered daily respiratory planning powered by Google Maps Platform and Firebase.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

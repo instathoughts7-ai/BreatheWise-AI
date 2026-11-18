@@ -1,0 +1,197 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Private user respiratory sensitivity preferences and unit settings (PII-free; email stays in Firebase Auth).",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "sensitivityProfile": {
+          "type": "string",
+          "enum": [
+            "general",
+            "athletes",
+            "children_elderly",
+            "respiratory",
+            "heart_condition",
+            "pregnant"
+          ]
+        },
+        "aqiStandard": {
+          "type": "string",
+          "enum": ["uaqi", "usa_epa"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "displayName",
+        "sensitivityProfile",
+        "aqiStandard",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SavedLocation": {
+      "title": "SavedLocation",
+      "description": "A user-saved geographic monitoring location.",
+      "type": "object",
+      "properties": {
+        "locationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "formattedAddress": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "latitude": {
+          "type": "number"
+        },
+        "longitude": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "locationId",
+        "userId",
+        "label",
+        "formattedAddress",
+        "latitude",
+        "longitude",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SavedPlan": {
+      "title": "SavedPlan",
+      "description": "A persisted daily exposure and respiratory protection plan generated via Gemini.",
+      "type": "object",
+      "properties": {
+        "planId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "locationLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "aqiSnapshot": {
+          "type": "number"
+        },
+        "sensitivityProfile": {
+          "type": "string",
+          "enum": [
+            "general",
+            "athletes",
+            "children_elderly",
+            "respiratory",
+            "heart_condition",
+            "pregnant"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "bestWindow": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "recommendations": {
+          "type": "array"
+        },
+        "dataSource": {
+          "type": "string",
+          "enum": ["live_google_aq", "sample_baseline"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "planId",
+        "userId",
+        "locationLabel",
+        "aqiSnapshot",
+        "sensitivityProfile",
+        "summary",
+        "bestWindow",
+        "recommendations",
+        "dataSource",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Owner-only user profile storing respiratory sensitivity and display preferences."
+    },
+    "/users/{userId}/locations/{locationId}": {
+      "schema": {
+        "$ref": "#/entities/SavedLocation"
+      },
+      "description": "Owner-only saved air quality monitoring locations."
+    },
+    "/users/{userId}/plans/{planId}": {
+      "schema": {
+        "$ref": "#/entities/SavedPlan"
+      },
+      "description": "Owner-only saved Gemini daily air quality plans."
+    }
+  }
+}

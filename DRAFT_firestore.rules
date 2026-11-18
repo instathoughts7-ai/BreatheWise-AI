@@ -1,0 +1,229 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: deny all by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isVerifiedOwner(userId) {
+      return isOwner(userId) && request.auth.token.email_verified == true;
+    }
+
+    function isValidSensitivity(profile) {
+      return profile in [
+        'general',
+        'athletes',
+        'children_elderly',
+        'respiratory',
+        'heart_condition',
+        'pregnant'
+      ];
+    }
+
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll([
+        'userId',
+        'displayName',
+        'sensitivityProfile',
+        'aqiStandard',
+        'createdAt',
+        'updatedAt'
+      ])
+      && data.keys().hasOnly([
+        'userId',
+        'displayName',
+        'sensitivityProfile',
+        'aqiStandard',
+        'createdAt',
+        'updatedAt'
+      ])
+      && data.userId is string
+      && data.userId == userId
+      && data.displayName is string
+      && data.displayName.size() >= 1
+      && data.displayName.size() <= 80
+      && isValidSensitivity(data.sensitivityProfile)
+      && data.aqiStandard in ['uaqi', 'usa_epa']
+      && data.createdAt is timestamp
+      && data.updatedAt is timestamp;
+    }
+
+    function isValidSavedLocation(data, userId, locationId) {
+      return data.keys().hasAll([
+        'locationId',
+        'userId',
+        'label',
+        'formattedAddress',
+        'latitude',
+        'longitude',
+        'createdAt',
+        'updatedAt'
+      ])
+      && data.keys().hasOnly([
+        'locationId',
+        'userId',
+        'label',
+        'formattedAddress',
+        'latitude',
+        'longitude',
+        'createdAt',
+        'updatedAt'
+      ])
+      && data.locationId is string
+      && data.locationId == locationId
+      && data.userId is string
+      && data.userId == userId
+      && data.label is string
+      && data.label.size() >= 1
+      && data.label.size() <= 100
+      && data.formattedAddress is string
+      && data.formattedAddress.size() >= 1
+      && data.formattedAddress.size() <= 240
+      && data.latitude is number
+      && data.latitude >= -90
+      && data.latitude <= 90
+      && data.longitude is number
+      && data.longitude >= -180
+      && data.longitude <= 180
+      && data.createdAt is timestamp
+      && data.updatedAt is timestamp;
+    }
+
+    function isValidSavedPlan(data, userId, planId) {
+      return data.keys().hasAll([
+        'planId',
+        'userId',
+        'locationLabel',
+        'aqiSnapshot',
+        'sensitivityProfile',
+        'summary',
+        'bestWindow',
+        'recommendations',
+        'dataSource',
+        'createdAt'
+      ])
+      && data.keys().hasOnly([
+        'planId',
+        'userId',
+        'locationLabel',
+        'aqiSnapshot',
+        'sensitivityProfile',
+        'summary',
+        'bestWindow',
+        'recommendations',
+        'dataSource',
+        'createdAt'
+      ])
+      && data.planId is string
+      && data.planId == planId
+      && data.userId is string
+      && data.userId == userId
+      && data.locationLabel is string
+      && data.locationLabel.size() >= 1
+      && data.locationLabel.size() <= 120
+      && data.aqiSnapshot is number
+      && data.aqiSnapshot >= 0
+      && data.aqiSnapshot <= 500
+      && isValidSensitivity(data.sensitivityProfile)
+      && data.summary is string
+      && data.summary.size() >= 1
+      && data.summary.size() <= 600
+      && data.bestWindow is string
+      && data.bestWindow.size() >= 1
+      && data.bestWindow.size() <= 160
+      && data.recommendations is list
+      && data.recommendations.size() >= 1
+      && data.recommendations.size() <= 10
+      && data.recommendations[0] is string
+      && data.dataSource in ['live_google_aq', 'sample_baseline']
+      && data.createdAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isOwner(userId);
+      allow list: if false;
+      allow create: if isValidId(userId)
+        && isVerifiedOwner(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(userId)
+        && isVerifiedOwner(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'displayName',
+          'sensitivityProfile',
+          'aqiStandard',
+          'updatedAt'
+        ]);
+      allow delete: if isValidId(userId) && isVerifiedOwner(userId);
+
+      match /locations/{locationId} {
+        allow get: if isValidId(userId) && isValidId(locationId) && isOwner(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isValidId(userId)
+          && isValidId(locationId)
+          && isVerifiedOwner(userId)
+          && isValidSavedLocation(incoming(), userId, locationId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time;
+        allow update: if isValidId(userId)
+          && isValidId(locationId)
+          && isVerifiedOwner(userId)
+          && isValidSavedLocation(incoming(), userId, locationId)
+          && incoming().locationId == existing().locationId
+          && incoming().userId == existing().userId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'label',
+            'formattedAddress',
+            'latitude',
+            'longitude',
+            'updatedAt'
+          ]);
+        allow delete: if isValidId(userId) && isValidId(locationId) && isVerifiedOwner(userId);
+      }
+
+      match /plans/{planId} {
+        allow get: if isValidId(userId) && isValidId(planId) && isOwner(userId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+        allow create: if isValidId(userId)
+          && isValidId(planId)
+          && isVerifiedOwner(userId)
+          && isValidSavedPlan(incoming(), userId, planId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && incoming().createdAt == request.time;
+        allow update: if false;
+        allow delete: if isValidId(userId) && isValidId(planId) && isVerifiedOwner(userId);
+      }
+    }
+  }
+}

@@ -4,14 +4,29 @@
 
 **An AI-powered Urban Air Quality Intelligence Platform that transforms real-time pollution data into personalized, actionable insights for healthier daily decisions.**
 
+### 🚀 Project Links
+
+[**Live Application**](https://breathewise-ai.ai.studio) | [**GitHub Repository**](https://github.com/instathoughts7-ai/BreatheWise-AI)
+
+### 🛠️ Built With
+
+![Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini-4285F4?logo=google)
+![Google Air Quality API](https://img.shields.io/badge/Maps-Air%20Quality%20API-34A853?logo=googlemaps)
+![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?logo=typescript)
+![Firebase](https://img.shields.io/badge/Database-Firebase-FFCA28?logo=firebase)
+![Node.js](https://img.shields.io/badge/Backend-Node.js-339933?logo=nodedotjs)
+
+---
+
+# 🌍 BreatheWise AI
+
+### Breathe Smarter. Protect Your Family. Live Sustainably.
+
+**An AI-powered Urban Air Quality Intelligence Platform that transforms real-time pollution data into personalized, actionable insights for healthier daily decisions.**
+
 ---
 <img width="1027" height="812" alt="image" src="https://github.com/user-attachments/assets/13d13446-bc6c-48ae-a5c4-69c49da5bb04" />
-
-\<p align="center">   \<a href="[https://breathewise-ai.ai.studio](https://breathewise-ai.ai.studio)">🚀 Live Application\</a> •   \<a href="[https://github.com/instathoughts7-ai/BreatheWise-AI](https://github.com/instathoughts7-ai/BreatheWise-AI)">💻 GitHub Repository\</a> \</p>
-
-\<p align="center">   \<img src="[https://img.shields.io/badge/AI-Google%20Gemini-4285F4?logo=google](https://img.shields.io/badge/AI-Google%20Gemini-4285F4?logo=google)" alt="Google Gemini" />   \<img src="[https://img.shields.io/badge/Maps-Google%20Air%20Quality%20API-34A853?logo=googlemaps](https://img.shields.io/badge/Maps-Google%20Air%20Quality%20API-34A853?logo=googlemaps)" alt="Google Air Quality API" />   \<img src="[https://img.shields.io/badge/Frontend-React-61DAFB?logo=react](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react)" alt="React" />   \<img src="[https://img.shields.io/badge/Language-TypeScript-3178C6?logo=typescript](https://img.shields.io/badge/Language-TypeScript-3178C6?logo=typescript)" alt="TypeScript" />   \<img src="[https://img.shields.io/badge/Database-Firebase-FFCA28?logo=firebase](https://img.shields.io/badge/Database-Firebase-FFCA28?logo=firebase)" alt="Firebase" />   \<img src="[https://img.shields.io/badge/Backend-Node.js-339933?logo=nodedotjs](https://img.shields.io/badge/Backend-Node.js-339933?logo=nodedotjs)" alt="Node.js" />   \<img src="[https://img.shields.io/badge/License-MIT-green.svg](https://img.shields.io/badge/License-MIT-green.svg)" alt="MIT License" /> \</p>
-
-
 
 ## 📌 Table of Contents
 
